@@ -29,7 +29,24 @@ c.execute('''
                 `roomPrice` INTEGER NOT NULL,
                 `number` INTEGER NOT NULL,
                 PRIMARY KEY(`hotelID`, `roomType`)
-                )''')
+        )''')
+
+c.execute('''
+        DROP TABLE IF EXISTS `requests`
+        ''')
+c.execute('''
+        CREATE TABLE `requests` (
+                `userID` INTEGER NOT NULL,
+                `requestID` INTEGER NOT NULL,
+                `hotelID` INTEGER NOT NULL,
+                `startDate` TEXT NOT NULL,
+                `endDate` TEXT NOT NULL,
+                `single` INTEGER NOT NULL,
+                `double` INTEGER NOT NULL,
+                `quad` INTEGER NOT NULL,
+                `price` INTEGER NOT NULL,
+                PRIMARY KEY(`requestID`)
+        )''')
 
 #Reading hotel list file
 room_dict = {"Single" : 1, "Double" : 2, "Quad" : 4}
