@@ -87,7 +87,7 @@ public class Searcher {
 		// Check if there are rooms available first
 		try {
 			price = checkHotel(hotelID, start, end, desiredRooms);
-			if(price < 0) throw new NoMoreRoomException(dic.get(-1 * price));
+			if(price < 0) throw new NoMoreRoomException("Not enough " + dic.get(-1 * price) + " rooms available!");
 			// Make the request if all desired rooms are available
 			try {
 				Statement statement = connection.createStatement();
@@ -234,12 +234,12 @@ public class Searcher {
 		}
 		
 		// Demo for project feature : 2. make reservations
-		System.out.println("\n\nFeature 2 demo");
+		System.out.println("\nFeature 2 demo");
 		System.out.println(makeRequest(0, 770, "2011-01-01", "2011-01-03", desiredRooms));
 		System.out.println(makeRequest(0, 1117, "2013-02-04", "2013-02-06", desiredRooms));
 		
 		// Demo for project feature : 4. look for a certain request
-		System.out.println("\n\nFeature 4 demo");
+		System.out.println("\nFeature 4 demo");
 		Request ret = searchRequest(0, 2);
 		if(ret != null) System.out.println("Search result :\n" + ret.toString());
 	}
