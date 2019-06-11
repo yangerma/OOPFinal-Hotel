@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Searcher {
 	// A map from the amount of people a room can hold to room type
@@ -134,6 +133,30 @@ public class Searcher {
 		return null;
 	}
 	
+	// Search for a request with requestID
+	// MAIN FUNCTION of project feature : 4. look for a certain request
+	public static Request searchRequest(int userID, int requestID) {
+		Connection connection = startConnection();
+		try {
+			ResultSet rs = findRequest(userID, requestID);
+			if(!rs.next()) throw new Exception("Wrong userID/requestID, no matching request found");
+			int hotelID = rs.getInt("hotelID");
+			String start = rs.getString("startDate");
+			String end = rs.getString("endDate");
+			Map<Integer, Integer> rooms = new HashMap<Integer, Integer>();
+			for(Map.Entry<Integer, String> entry : dic.entrySet()) {
+				rooms.put(entry.getKey(), rs.getInt(entry.getValue()));
+			}
+			int price = rs.getInt("price");
+			return new Request(userID, requestID, hotelID, start, end, rooms, price);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		} finally {
+			closeConnection();
+		}
+		return null;
+	}
+	
 	// Look into rooms database to check if a hotel have enough rooms to be booked
 	// USED IN project features : 1. look for available hotels 2. make reservations
 	private static int checkHotel (int hotelID, String start, String end, Map<Integer, Integer> desiredRooms) {
@@ -176,17 +199,48 @@ public class Searcher {
 		}
 		return totalPrice;
 	}
-
+	
+	// Search in requests table to look for the request
+	// USED IN project features : 3. modify/delete requests, 4. look for a certain request
+	private static ResultSet findRequest(int userID, int requestID) {
+		try {
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			ResultSet rs;
+			String command = "SELECT * FROM requests WHERE userID = ? AND requestID = ?";
+			PreparedStatement pstmt = connection.prepareStatement(command);
+			pstmt.setInt(1, userID);
+			pstmt.setInt(2, requestID);
+			rs = pstmt.executeQuery();
+			return rs;
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return null;
+	}
+	
+	// Demo code snippet
 	public static void main(String[] args) {
+		// Initialize the rooms desired into a map<Integer, Integer>
 		Map<Integer, Integer> desiredRooms = new HashMap<Integer, Integer>();
 		desiredRooms.put(1, 0);
 		desiredRooms.put(2, 20);
 		desiredRooms.put(4, 25);
+		
+		// Demo for project feature : 1. look for available hotels
+		System.out.println("Feature 1 demo");
 		for (Hotel temp : searchHotel(5, "2011-01-01", "2011-01-02", desiredRooms)) {
 			System.out.println(temp);
 		}
+		
+		// Demo for project feature : 2. make reservations
+		System.out.println("\n\nFeature 2 demo");
 		System.out.println(makeRequest(0, 770, "2011-01-01", "2011-01-03", desiredRooms));
 		System.out.println(makeRequest(0, 1117, "2013-02-04", "2013-02-06", desiredRooms));
-		System.out.println(makeRequest(0, 1117, "2013-01-08", "2014-02-05", desiredRooms));
+		
+		// Demo for project feature : 4. look for a certain request
+		System.out.println("\n\nFeature 4 demo");
+		Request ret = searchRequest(0, 2);
+		if(ret != null) System.out.println("Search result :\n" + ret.toString());
 	}
 }
