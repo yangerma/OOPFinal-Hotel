@@ -46,8 +46,7 @@ public class Searcher {
 		ArrayList<Hotel> list = new ArrayList<Hotel>();
 		try {
 			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30); // set timeout to 30 sec.
-
+			statement.setQueryTimeout(30);
 			ResultSet rs;
 			if (star == 0) {
 				rs = statement.executeQuery("SELECT * FROM hotels");
@@ -124,13 +123,48 @@ public class Searcher {
 				return result;
 			} catch (SQLException e) {
 				System.err.println(e.getMessage());
-			} finally {
-				closeConnection();
 			}
 		} catch(NoMoreRoomException e) {
 			System.err.println(e);
+		} finally {
+			closeConnection();
 		}
 		return null;
+	}
+	
+	// Try to delete a certain request
+	// MAIN FUNCTION of project feature : 3.1 delete requests
+	public static boolean deleteRequest(int userID, int requestID) {
+		Connection connection = startConnection();
+		try {
+			// Check if the request exists
+			ResultSet rs = findRequest(userID, requestID);
+			if(!rs.next()) throw new Exception("Wrong userID/requestID, no matching request found");
+			String start = rs.getString("startDate");
+			
+			// Retrieve today's date and see if it's too late
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			ResultSet now = statement.executeQuery("SELECT Date('now')");
+			if(!now.next()) throw new Exception("Something wierd happened.");
+			String today = now.getString(1);
+			if(today.compareTo(start) > 0) throw new TooLateException();
+			
+			// No problem deleting the request now
+			String command = "DELETE FROM requests WHERE userID = ? AND requestID = ?";
+			PreparedStatement pstmt = connection.prepareStatement(command);
+			pstmt.setInt(1, userID);
+			pstmt.setInt(2, requestID);
+			pstmt.executeUpdate();
+			return true;
+		} catch (TooLateException e){
+			System.err.println(e.getMessage());
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		} finally {
+			closeConnection();
+		}
+		return false;
 	}
 	
 	// Search for a request with requestID
@@ -162,16 +196,18 @@ public class Searcher {
 	private static int checkHotel (int hotelID, String start, String end, Map<Integer, Integer> desiredRooms) {
 		int totalPrice = 0;
 		try {
+			// Look up rooms that are already booked in this hotel in requests table
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			ResultSet rs;
-			String command = "SELECT * FROM requests WHERE NOT ((Date(startDate) < ? "
-					+ "AND Date(endDate) < ?) OR (Date(startDate) > ? AND Date(endDate) < ?))";
+			String command = "SELECT * FROM requests WHERE hotelID = ? AND (NOT ((Date(startDate) < ? "
+					+ "AND Date(endDate) < ?) OR (Date(startDate) > ? AND Date(endDate) < ?)))";
 			PreparedStatement pstmt = connection.prepareStatement(command);
-			pstmt.setString(1, start);
+			pstmt.setInt(1, hotelID);
 			pstmt.setString(2, start);
-			pstmt.setString(3, end);
+			pstmt.setString(3, start);
 			pstmt.setString(4, end);
+			pstmt.setString(5, end);
 			rs = pstmt.executeQuery();
 			Map<Integer, Integer> booked = new HashMap<Integer, Integer>();
 			for(Integer roomType : desiredRooms.keySet()) {
@@ -183,6 +219,7 @@ public class Searcher {
 				}
 			}
 			
+			// Compute the remaining number of rooms available and check if enough
 			command = "SELECT * FROM rooms WHERE hotelID = ? AND roomType = ?";
 			pstmt = connection.prepareStatement(command);
 			pstmt.setInt(1, hotelID);
@@ -201,7 +238,7 @@ public class Searcher {
 	}
 	
 	// Search in requests table to look for the request
-	// USED IN project features : 3. modify/delete requests, 4. look for a certain request
+	// USED IN project features : 3. delete/modify requests, 4. look for a certain request
 	private static ResultSet findRequest(int userID, int requestID) {
 		try {
 			Statement statement = connection.createStatement();
@@ -235,12 +272,18 @@ public class Searcher {
 		
 		// Demo for project feature : 2. make reservations
 		System.out.println("\nFeature 2 demo");
-		System.out.println(makeRequest(0, 770, "2011-01-01", "2011-01-03", desiredRooms));
-		System.out.println(makeRequest(0, 1117, "2013-02-04", "2013-02-06", desiredRooms));
+		System.out.println(makeRequest(0, 770, "2020-01-01", "2020-01-03", desiredRooms));
+		System.out.println(makeRequest(0, 1117, "2020-02-04", "2020-02-06", desiredRooms));
+		System.out.println(makeRequest(1, 1176, "2019-03-03", "2019-10-10", desiredRooms));
+		
+		// Demo for project feature : 3.1 delete requests
+		System.out.println("\nFeature 3 demo");
+		if(deleteRequest(0, 1)) System.out.println("Successfully deleted request (0, 1)");
+		if(deleteRequest(0, 2)) System.out.println("Successfully deleted request (0, 2)");
 		
 		// Demo for project feature : 4. look for a certain request
 		System.out.println("\nFeature 4 demo");
-		Request ret = searchRequest(0, 2);
+		Request ret = searchRequest(1, 3);
 		if(ret != null) System.out.println("Search result :\n" + ret.toString());
 	}
 }
