@@ -1,10 +1,11 @@
 package main;
 
-public class NoMoreRoomException extends Exception {
-	public NoMoreRoomException () {
-		super("Not enough rooms available!");
+public class NoMoreRoomException extends RuntimeException {
+	String ret;
+	public NoMoreRoomException (String roomType) {
+		ret = "Not enough " + roomType + " room left!";
 	}
-	public NoMoreRoomException (String msg) {
-		super(msg);
+	public String toString() {
+		return ret;
 	}
 }

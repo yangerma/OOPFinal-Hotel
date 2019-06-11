@@ -1,6 +1,6 @@
 package main;
 
-public class TooLateException extends Exception {
+public class TooLateException extends RuntimeException {
 	public TooLateException() {
 		super("Too late to delete/modify this request!");
 	}

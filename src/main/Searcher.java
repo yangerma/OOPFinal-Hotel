@@ -44,6 +44,7 @@ public class Searcher {
 	(int star, String start, String end, Map<Integer, Integer> desiredRooms) {
 		Connection connection = startConnection();
 		ArrayList<Hotel> list = new ArrayList<Hotel>();
+		
 		try {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
@@ -124,8 +125,6 @@ public class Searcher {
 			} catch (SQLException e) {
 				System.err.println(e.getMessage());
 			}
-		} catch(NoMoreRoomException e) {
-			System.err.println(e);
 		} finally {
 			closeConnection();
 		}
@@ -139,14 +138,14 @@ public class Searcher {
 		try {
 			// Check if the request exists
 			ResultSet rs = findRequest(userID, requestID);
-			if(!rs.next()) throw new Exception("Wrong userID/requestID, no matching request found");
+			if(!rs.next()) throw new RuntimeException("Wrong userID/requestID, no matching request found");
 			String start = rs.getString("startDate");
 			
 			// Retrieve today's date and see if it's too late
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			ResultSet now = statement.executeQuery("SELECT Date('now')");
-			if(!now.next()) throw new Exception("Something wierd happened.");
+			if(!now.next()) throw new RuntimeException("Something wierd happened.");
 			String today = now.getString(1);
 			if(today.compareTo(start) > 0) throw new TooLateException();
 			
@@ -157,9 +156,7 @@ public class Searcher {
 			pstmt.setInt(2, requestID);
 			pstmt.executeUpdate();
 			return true;
-		} catch (TooLateException e){
-			System.err.println(e.getMessage());
-		} catch (Exception e) {
+		} catch (SQLException e){
 			System.err.println(e.getMessage());
 		} finally {
 			closeConnection();
@@ -173,7 +170,7 @@ public class Searcher {
 		Connection connection = startConnection();
 		try {
 			ResultSet rs = findRequest(userID, requestID);
-			if(!rs.next()) throw new Exception("Wrong userID/requestID, no matching request found");
+			if(!rs.next()) throw new RuntimeException("Wrong userID/requestID, no matching request found");
 			int hotelID = rs.getInt("hotelID");
 			String start = rs.getString("startDate");
 			String end = rs.getString("endDate");
@@ -183,7 +180,7 @@ public class Searcher {
 			}
 			int price = rs.getInt("price");
 			return new Request(userID, requestID, hotelID, start, end, rooms, price);
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		} finally {
 			closeConnection();
