@@ -30,17 +30,8 @@ public class Hotel{
 	};
 
 	public String toString() {
-		String ret = "";
-		ret += "id = ";
-		ret += id;
-		ret += ", star = ";
-		ret += star;
-		ret += ", locality = ";
-		ret += locality;
-		ret += ", address = ";
-		ret += address;
-		ret += ", totalPrice = ";
-		ret += totalPrice;
+		String ret = "id = " + id + ", star = " + star + ", locality = " + locality +
+				", address = " + address + ", totalPrice = " + totalPrice;
 		return ret;
 	}
 }
