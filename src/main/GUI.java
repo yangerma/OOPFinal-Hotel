@@ -778,16 +778,43 @@ public class GUI extends JFrame {
 							After.setVisible(true);
 							btnCancel.setVisible(true);
 							SendModify.setVisible(true);
+							
+							try {
+								Request ret = searchRoom.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
+								if(ret != null) {
+									textArea.setText("");
+									String[] tmp = ret.toString().split("\n");
+									String[] tmp2 = tmp[0].split(",|=");
+									HotelID.setText(tmp2[5]);
+									EnterDateOriginal.setText(tmp2[7]);
+									OutDateOriginal.setText(tmp2[9]);
+									SingleOriginal.setText(tmp[1].split(":")[1]);
+									DoubleOriginal.setText(tmp[2].split(":")[1]);
+									QuadOriginal.setText(tmp[3].split(":")[1]);
+								}
+								else {
+									textArea.append("Query error. No such Reserved ID.");
+								}
+							}catch(Exception err) {
+								textArea.setText(err.toString());
+								textArea.append("\r\nQuery error. No such Reserved ID.");
+							}
 						}
 					});
 					
 					btnCancel.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							if(searchRoom.deleteRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()))) {
-								textArea.setText("Cancel successfully");
-							}
-							else {
-								textArea.setText("Fail to delete. Please check your reserved ID.");
+							try {
+								if(searchRoom.deleteRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()))) {
+									textArea.setText("Cancel successfully");
+								}
+								else {
+									textArea.setText("Fail to delete. Please check your reserved ID.");
+								}
+							}catch(Exception err) {
+								textArea.setText("");
+								textArea.append(err.toString());
+								textArea.append("\r\nFail to delete. Please check your reserved ID.");
 							}
 						}
 					});
@@ -849,13 +876,19 @@ public class GUI extends JFrame {
 					Send.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 							scrollPane.setVisible(true);
-							Request ret = searchRoom.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
-							if(ret != null) {
+							try {
+								Request ret = searchRoom.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
+								if(ret != null) {
+									textArea.setText("");
+									textArea.append(ret.toString());
+								}
+								else {
+									textArea.setText("No such reserved ID.");
+								}
+							}catch(Exception err) {
 								textArea.setText("");
-								textArea.append(ret.toString());
-							}
-							else {
-								textArea.setText("No such reserved ID.");
+								textArea.append(err.toString());
+								textArea.append("\r\nNo such reserved ID.");
 							}
 						}
 					});
