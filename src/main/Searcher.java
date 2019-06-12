@@ -306,7 +306,7 @@ public class Searcher {
 		System.out.println("\nFeature 2 demo");
 		System.out.println(makeRequest(0, 770, "2020-01-01", "2020-01-03", desiredRooms));
 		System.out.println(makeRequest(0, 1117, "2020-02-04", "2020-02-06", desiredRooms));
-		System.out.println(makeRequest(1, 1176, "2019-03-03", "2019-10-10", desiredRooms));
+		System.out.println(makeRequest(1, 1176, "2019-10-03", "2019-10-10", desiredRooms));
 		
 		// Demo for project feature : 3.1 delete requests
 		System.out.println("\nFeature 3 demo");
@@ -317,5 +317,8 @@ public class Searcher {
 		System.out.println("\nFeature 4 demo");
 		Request ret = searchRequest(1, 3);
 		if(ret != null) System.out.println("Search result :\n" + ret.toString());
+		
+		// Cleaning up
+		deleteRequest(1, 3);
 	}
 }
