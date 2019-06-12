@@ -24,7 +24,7 @@ public class InputChecker {
 			LocalDate before = LocalDate.parse(start);
 			LocalDate after = LocalDate.parse(end);
 			if(before.isEqual(after)) 
-				throw new InputException("Illegal inputs : you cannot check in and check out at the smae day!");
+				throw new InputException("Illegal inputs : you cannot check in and check out at the same day!");
 			if(before.isAfter(after)) throw new InputException("Illegal inputs : the dates are reversed!");
 		} catch(DateTimeParseException e) {
 			throw new InputException("Illegal input : date!");
@@ -46,10 +46,13 @@ public class InputChecker {
 		boolean changed = false;
 		
 		// Check dates
-		int startDiff = start.compareTo(newStart);
-		int endDiff = end.compareTo(newEnd);
-		if(startDiff > 0 || endDiff < 0) throw new InputException("Illegal input : you can only shroten the time reserved!");
-		else if(startDiff != 0 && endDiff != 0) changed = true;
+		LocalDate before = LocalDate.parse(start);
+		LocalDate after = LocalDate.parse(end);
+		LocalDate newBefore = LocalDate.parse(newStart);
+		LocalDate newAfter = LocalDate.parse(newEnd);
+		if(newBefore.isBefore(before) || newAfter.isAfter(after))
+			throw new InputException("Illegal input : you can only shroten the time reserved!");
+		else if(!newBefore.isEqual(before) && !newAfter.isAfter(after)) changed = true;
 		
 		// Check numbers of rooms
 		for(Map.Entry<Integer, String> roomType : Searcher.dic.entrySet()) {

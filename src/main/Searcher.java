@@ -67,12 +67,12 @@ public class Searcher {
 			// Show the results
 			while (rs.next()) {
 				int id = rs.getInt("hotelID");
-				int price = checkHotel(id, start, end, desiredRooms);
-				if (price > 0) {
+				int valid = checkHotel(id, start, end, desiredRooms);
+				if (valid > 0) {
 					int hotelStar = rs.getInt("hotelStar");
 					String locality = rs.getString("locality");
 					String address = rs.getString("address");
-					list.add(new Hotel(id, hotelStar, locality, address, price));
+					list.add(new Hotel(id, hotelStar, locality, address, computePrice(id, start, end, desiredRooms)));
 				}
 			}
 		} catch (SQLException e) {
@@ -96,51 +96,55 @@ public class Searcher {
 		InputChecker.roomsCheck(desiredRooms);
 		if(LocalDate.parse(getToday()).isAfter(LocalDate.parse(start))) throw new TooLateException("Too late to book rooms!");
 		
-		int price = 0;
 		int requestID = 0;
-		
-		// Check if there are rooms available first
 		try {
-			price = checkHotel(hotelID, start, end, desiredRooms);
-			if(price < 0) throw new NoMoreRoomException("Not enough " + dic.get(-1 * price) + " rooms available!");
+			// Check if the hotel exists first
+			ResultSet rs;
+			String command = "SELECT * FROM hotels WHERE hotelID = ?";
+			PreparedStatement pstmt = connection.prepareStatement(command);
+			pstmt.setInt(1, hotelID);
+			rs = pstmt.executeQuery();
+			if(!rs.next()) throw new NoMoreRoomException("The hotel doesn't exist!");
 			
-			// Make the request if all desired rooms are available
-			try {
-				Statement statement = connection.createStatement();
-				statement.setQueryTimeout(30);
-				ResultSet rs;
-				String command = "SELECT MAX(requestID) FROM requests";
-				rs = statement.executeQuery(command);
-				if(rs.next()) {
-					requestID = rs.getInt(1) + 1;
-				}
-				else {
-					requestID = 0;
-				}
-				command = "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ";
-				int len = desiredRooms.size();
-				for(int i = 0; i < len; i++) {
-					command += "?, ";
-				}
-				command += "?)";
-				PreparedStatement pstmt = connection.prepareStatement(command);
-				pstmt.setInt(1, userID);
-				pstmt.setInt(2, requestID);
-				pstmt.setInt(3, hotelID);
-				pstmt.setString(4, start);
-				pstmt.setString(5, end);
-				int temp = 6;
-				for(Integer number : desiredRooms.values()) {
-					pstmt.setInt(temp, number);
-					temp += 1;
-				}
-				pstmt.setInt(temp, price);
-				pstmt.executeUpdate();
-				Request result = new Request(userID, requestID, hotelID, start, end, desiredRooms, price);
-				return result;
-			} catch (SQLException e) {
-				System.err.println(e.getMessage());
+			// Check if there are rooms available
+			int valid = checkHotel(hotelID, start, end, desiredRooms);
+			if(valid < 0) throw new NoMoreRoomException("Not enough " + dic.get(-1 * valid) + " rooms available!");
+			
+			// Make request if rooms are available
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			command = "SELECT MAX(requestID) FROM requests";
+			rs = statement.executeQuery(command);
+			if(rs.next()) {
+				requestID = rs.getInt(1) + 1;
 			}
+			else {
+				requestID = 0;
+			}
+			int price = computePrice(hotelID, start, end, desiredRooms);
+			command = "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ";
+			int len = desiredRooms.size();
+			for(int i = 0; i < len; i++) {
+				command += "?, ";
+			}
+			command += "?)";
+			pstmt = connection.prepareStatement(command);
+			pstmt.setInt(1, userID);
+			pstmt.setInt(2, requestID);
+			pstmt.setInt(3, hotelID);
+			pstmt.setString(4, start);
+			pstmt.setString(5, end);
+			int temp = 6;
+			for(Integer number : desiredRooms.values()) {
+				pstmt.setInt(temp, number);
+				temp += 1;
+			}
+			pstmt.setInt(temp, price);
+			pstmt.executeUpdate();
+			Request result = new Request(userID, requestID, hotelID, start, end, desiredRooms, price);
+			return result;
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
 		} finally {
 			closeConnection();
 		}
@@ -165,7 +169,7 @@ public class Searcher {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			if(LocalDate.parse(getToday()).isAfter(LocalDate.parse(start)))
-				throw new TooLateException("Too late to delete/modify request!");
+				throw new TooLateException("Too late to delete request!");
 			
 			// No problem deleting the request now
 			String command = "DELETE FROM requests WHERE userID = ? AND requestID = ?";
@@ -196,7 +200,7 @@ public class Searcher {
 		try {
 			// Check if the request exists and fetch old request data
 			ResultSet rs = findRequest(userID, requestID);
-			if(!rs.next()) throw new RuntimeException("Wrong userID/requestID, no matching request found");
+			int hotelID = rs.getInt("hotelID");
 			String start = rs.getString("startDate");
 			String end = rs.getString("endDate");
 			Map<Integer, Integer> rooms = new HashMap<Integer, Integer>();
@@ -205,15 +209,28 @@ public class Searcher {
 			}
 			
 			// Check if it's too late to modify request and check if the new request is valid
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
 			if(LocalDate.parse(getToday()).isAfter(LocalDate.parse(start)))
-				throw new TooLateException("Too late to delete/modify request!");
+				throw new TooLateException("Too late to modify request!");
 			InputChecker.newCheck(start, end, rooms, newStart, newEnd, newRooms);
 			
-			// Delete the request and make a new one
-			deleteRequest(userID, requestID);
-			makeRequest(userID, requestID, newStart, newEnd, newRooms);
+			// Update the request with new information
+			int price = computePrice(hotelID, newStart, newEnd, newRooms);
+			String command = "UPDATE requests SET startDate = ?, endDate = ?, ";
+			for(String roomType : dic.values()) {
+				command += roomType + " = ?, ";
+			}
+			command += "price = ? WHERE requestID = ?";
+			PreparedStatement pstmt = connection.prepareStatement(command);
+			pstmt.setString(1, newStart);
+			pstmt.setString(2, newEnd);
+			int temp = 3;
+			for(Integer number : newRooms.values()) {
+				pstmt.setInt(temp, number);
+				temp += 1;
+			}
+			pstmt.setInt(temp, price);
+			pstmt.setInt(temp + 1, requestID);
+			pstmt.executeUpdate();
 			return true;
 		} catch (SQLException e){
 			System.err.println(e.getMessage());
@@ -253,7 +270,7 @@ public class Searcher {
 	}
 	
 	// Get today's date
-	// USED IN all function that needs to check if the time is too late
+	// USED IN all functions that needs to check if the time is too late
 	private static String getToday() {
 		try {
 			Statement statement = connection.createStatement();
@@ -267,58 +284,76 @@ public class Searcher {
 		return null;
 	}
 	
-	// Look into rooms database to check if a hotel have enough rooms to be booked
-	// USED IN project features : 1. look for available hotels 2. make reservations
-	private static int checkHotel (int hotelID, String start, String end, Map<Integer, Integer> desiredRooms) {
+	// Calculate price for the request
+	// USED IN all functions that needs to get price
+	private static int computePrice(int hotelID, String start, String end, Map<Integer, Integer> desiredRooms) {
 		int totalPrice = 0;
 		try {
-			// Look up rooms that are already booked in this hotel in requests table
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
+			// Get the total numbers of rooms in the hotel
 			ResultSet rs;
-			String command = "SELECT * FROM requests WHERE hotelID = ? AND (NOT ((Date(startDate) < ? "
-					+ "AND Date(endDate) < ?) OR (Date(startDate) > ? AND Date(endDate) < ?)))";
+			String command = "SELECT * FROM rooms WHERE hotelID = ? AND roomType = ?";
 			PreparedStatement pstmt = connection.prepareStatement(command);
-			pstmt.setInt(1, hotelID);
-			pstmt.setString(2, start);
-			pstmt.setString(3, start);
-			pstmt.setString(4, end);
-			pstmt.setString(5, end);
-			rs = pstmt.executeQuery();
-			Map<Integer, Integer> booked = new HashMap<Integer, Integer>();
-			for(Integer roomType : desiredRooms.keySet()) {
-				booked.put(roomType, 0);
-			}
-			while(rs.next()) {
-				for(Integer roomType : desiredRooms.keySet()) {
-					booked.merge(roomType, rs.getInt(dic.get(roomType)), Integer::sum);
-				}
-			}
-			
-			// Compute the remaining number of rooms available and check if enough
-			command = "SELECT * FROM rooms WHERE hotelID = ? AND roomType = ?";
-			pstmt = connection.prepareStatement(command);
 			pstmt.setInt(1, hotelID);
 			for(Map.Entry<Integer, Integer> entry : desiredRooms.entrySet()) {
 				if(entry.getValue() != 0) {
 					pstmt.setInt(2, entry.getKey());
 					rs = pstmt.executeQuery();
-					if(rs.getInt("number") - booked.get(entry.getKey()) < entry.getValue()) return -1 * entry.getKey();
 					totalPrice += rs.getInt("roomPrice") * entry.getValue();
 				}
 			}
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
-		return totalPrice;
+		return totalPrice * Math.toIntExact(Request.countDays(start, end));
+	}
+	
+	// Look into rooms database to check if a hotel have enough rooms to be booked
+	// USED IN project features : 1. look for available hotels 2. make reservations
+	private static int checkHotel (int hotelID, String start, String end, Map<Integer, Integer> desiredRooms) {
+		int totalPrice = 0;
+		Map<Integer, Integer> allRooms = new HashMap<Integer, Integer>();
+		try {
+			// Get the total numbers of rooms in the hotel
+			ResultSet rs;
+			String command = "SELECT * FROM rooms WHERE hotelID = ? AND roomType = ?";
+			PreparedStatement pstmt = connection.prepareStatement(command);
+			pstmt.setInt(1, hotelID);
+			for(Map.Entry<Integer, Integer> entry : desiredRooms.entrySet()) {
+				if(entry.getValue() != 0) {
+					pstmt.setInt(2, entry.getKey());
+					rs = pstmt.executeQuery();
+					allRooms.put(entry.getKey(), rs.getInt("number"));
+				}
+			}
+			// Look up rooms that are already booked in this hotel in requests table
+			LocalDate before = LocalDate.parse(start);
+			LocalDate after = LocalDate.parse(end);
+			for(LocalDate i = before; i.isBefore(after); i = i.plusDays(1)) {
+				Map<Integer, Integer> remainRooms = allRooms;
+				command = "SELECT * FROM requests WHERE hotelID = ? AND ? BETWEEN startDate AND endDate";
+				pstmt = connection.prepareStatement(command);
+				pstmt.setInt(1, hotelID);
+				pstmt.setString(2, i.toString());
+				rs = pstmt.executeQuery();
+				while(rs.next()) {
+					for(Integer roomType : remainRooms.keySet()) {
+						remainRooms.merge(roomType, (-1) * rs.getInt(dic.get(roomType)), Integer::sum);
+					}
+				}
+				for(Map.Entry<Integer, Integer> roomsLeft : remainRooms.entrySet()) {
+					if(roomsLeft.getValue() < desiredRooms.get(roomsLeft.getKey())) return -1 * roomsLeft.getKey();
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return 1;
 	}
 	
 	// Search in requests table to look for the request
 	// USED IN project features : 3. delete/modify requests, 4. look for a certain request
 	private static ResultSet findRequest(int userID, int requestID) {
 		try {
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
 			ResultSet rs;
 			String command = "SELECT * FROM requests WHERE userID = ? AND requestID = ?";
 			PreparedStatement pstmt = connection.prepareStatement(command);
@@ -356,6 +391,10 @@ public class Searcher {
 		System.out.println("\nFeature 3 demo");
 		if(deleteRequest(0, 1)) System.out.println("Successfully deleted request (0, 1)");
 		if(deleteRequest(0, 2)) System.out.println("Successfully deleted request (0, 2)");
+		
+		// Demo for project feature : 3.2 modify requests
+		if(modifyRequest(1, 3, "2019-10-05", "2019-10-10", desiredRooms))
+			System.out.println("Successfully modified request (1, 3)");
 		
 		// Demo for project feature : 4. look for a certain request
 		System.out.println("\nFeature 4 demo");

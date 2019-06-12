@@ -13,7 +13,7 @@ public class Request {
 	private int totalPrice;
 	
 	// A function to count the days between two dates
-	private static long countDays(String start, String end) {
+	public static long countDays(String start, String end) {
 		LocalDate before = LocalDate.parse(start);
 		LocalDate after = LocalDate.parse(end);
 		return ChronoUnit.DAYS.between(before, after);
