@@ -160,7 +160,7 @@ public class Searcher {
 			if(!rs.next()) throw new RuntimeException("Wrong userID/requestID, no matching request found");
 			String start = rs.getString("startDate");
 			
-			// See if it's too late to delete/modify request
+			// Check if it's too late to delete request
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			if(getToday().compareTo(start) > 0) throw new TooLateException("Too late to delete/modify request!");
@@ -171,6 +171,46 @@ public class Searcher {
 			pstmt.setInt(1, userID);
 			pstmt.setInt(2, requestID);
 			pstmt.executeUpdate();
+			return true;
+		} catch (SQLException e){
+			System.err.println(e.getMessage());
+		} finally {
+			closeConnection();
+		}
+		return false;
+	}
+	
+	// Try to modify request
+	// MAIN FUNCTION of project feature : 3.2 modify requests
+	public static boolean modifyRequest
+	(int userID, int requestID, String newStart, String newEnd, Map<Integer, Integer> newRooms) {
+		Connection connection = startConnection();
+		
+		// Check if inputs are legal
+		InputChecker.requestCheck(requestID);
+		InputChecker.datesCheck(newStart, newEnd);
+		InputChecker.roomsCheck(newRooms);
+		
+		try {
+			// Check if the request exists and fetch old request data
+			ResultSet rs = findRequest(userID, requestID);
+			if(!rs.next()) throw new RuntimeException("Wrong userID/requestID, no matching request found");
+			String start = rs.getString("startDate");
+			String end = rs.getString("endDate");
+			Map<Integer, Integer> rooms = new HashMap<Integer, Integer>();
+			for(Map.Entry<Integer, String> roomType : dic.entrySet()) {
+				rooms.put(roomType.getKey(), rs.getInt(roomType.getValue()));
+			}
+			
+			// Check if it's too late to modify request and check if the new request is valid
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			if(getToday().compareTo(start) > 0) throw new TooLateException("Too late to delete/modify request!");
+			InputChecker.newCheck(start, end, rooms, newStart, newEnd, newRooms);
+			
+			// Delete the request and make a new one
+			deleteRequest(userID, requestID);
+			makeRequest(userID, requestID, newStart, newEnd, newRooms);
 			return true;
 		} catch (SQLException e){
 			System.err.println(e.getMessage());

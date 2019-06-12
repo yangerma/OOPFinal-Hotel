@@ -60,4 +60,26 @@ public class InputChecker {
 		}
 		if(!hasRoom) throw new InputException("Do you want to book some rooms or not?");
 	}
+	
+	public static void newCheck
+	(String start, String end, Map<Integer, Integer> rooms, String newStart, String newEnd, Map<Integer, Integer> newRooms) {
+		boolean changed = false;
+		
+		// Check dates
+		int startDiff = start.compareTo(newStart);
+		int endDiff = end.compareTo(newEnd);
+		if(startDiff > 0 || endDiff < 0) throw new InputException("You can only shroten the time reserved!");
+		else if(startDiff != 0 && endDiff != 0) changed = true;
+		
+		// Check numbers of rooms
+		for(Map.Entry<Integer, String> roomType : Searcher.dic.entrySet()) {
+			int oldRoom = rooms.get(roomType.getKey());
+			int newRoom = newRooms.get(roomType.getKey());
+			if(oldRoom < newRoom)
+				throw new InputException("You are trying to book even more " + roomType.getValue() + " rooms!");
+			else if(oldRoom != newRoom) changed = true;
+		}
+		
+		if(!changed) throw new InputException("You are not trying to change anything!");
+	}
 }
