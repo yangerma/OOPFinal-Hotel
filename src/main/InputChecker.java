@@ -23,7 +23,7 @@ public class InputChecker {
 		if(startParts.length != 3) throw new InputException("Illegal input : start date!");
 		if(endParts.length != 3) throw new InputException("Illegal input : end date!");
 		String[] part = {"year", "month", "day"};
-		int[] days = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+		int[] days = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 		for(int i = 0; i < 3; i++) {
 			try {
 				int temp = Integer.valueOf(startParts[i]);
@@ -48,12 +48,16 @@ public class InputChecker {
 				throw new RuntimeException("Ending " + part[i] + " cannot be empty!");
 			}
 		}
+		if(start.compareTo(end) > 0) throw new RuntimeException("Illegal inputs : the dates are reversed!");
 	}
 	
 	// Check desired rooms
 	public static void roomsCheck(Map<Integer, Integer> desiredRooms) {
+		boolean hasRoom = false;
 		for(Integer rooms : desiredRooms.values()) {
 			if(rooms < 0) throw new InputException("Illegal input : number of rooms!");
+			if(rooms > 0) hasRoom = true;
 		}
+		if(!hasRoom) throw new InputException("Do you want to book some rooms or not?");
 	}
 }

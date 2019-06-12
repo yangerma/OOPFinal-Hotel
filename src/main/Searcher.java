@@ -93,6 +93,7 @@ public class Searcher {
 		InputChecker.hotelCheck(hotelID);
 		InputChecker.datesCheck(start, end);
 		InputChecker.roomsCheck(desiredRooms);
+		if(getToday().compareTo(start) > 0) throw new TooLateException("Too late to book rooms!");
 		
 		int price = 0;
 		int requestID = 0;
