@@ -1,0 +1,59 @@
+package main;
+
+import java.util.*;
+
+public class InputChecker {
+	// Check hotelStar
+	public static void starCheck(int star) {
+		if(star < 0 || star > 5) throw new InputException("Illegal input : hotel star!");
+	}
+	
+	public static void hotelCheck(int hotelID) {
+		if(hotelID < 0) throw new InputException("Illegal input : hotel ID!");
+	}
+	
+	public static void requestCheck(int requestID) {
+		if(requestID < 0) throw new InputException("Illegal input : request ID!");
+	}
+	
+	// Check starting and ending dates
+	public static void datesCheck(String start, String end) {
+		String[] startParts = start.split("-");
+		String[] endParts = end.split("-");
+		if(startParts.length != 3) throw new InputException("Illegal input : start date!");
+		if(endParts.length != 3) throw new InputException("Illegal input : end date!");
+		String[] part = {"year", "month", "day"};
+		int[] days = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+		for(int i = 0; i < 3; i++) {
+			try {
+				int temp = Integer.valueOf(startParts[i]);
+				if(temp < 0) throw new InputException("Illegal input : start " + part[i] + "!");
+				if(i == 1 && temp > 12) throw new InputException("Illegal input : start month!");
+				if(i == 2 && temp > days[Integer.valueOf(startParts[1])])
+					throw new InputException("Illegal input : start day!");
+			} catch(NumberFormatException e) {
+				throw new RuntimeException("Not a number : start " + part[i] + "!");
+			} catch(NullPointerException e) {
+				throw new RuntimeException("Starting " + part[i] + " cannot be empty!");
+			}
+			try {
+				int temp = Integer.valueOf(endParts[i]);
+				if(temp < 0) throw new InputException("Illegal input : end " + part[i] + "!");
+				if(i == 1 && temp > 12) throw new InputException("Illegal input : end month!");
+				if(i == 2 && temp > days[Integer.valueOf(endParts[1])])
+					throw new InputException("Illegal input : end day!");
+			} catch(NumberFormatException e) {
+				throw new RuntimeException("Not a number : end " + part[i] + "!");
+			} catch(NullPointerException e) {
+				throw new RuntimeException("Ending " + part[i] + " cannot be empty!");
+			}
+		}
+	}
+	
+	// Check desired rooms
+	public static void roomsCheck(Map<Integer, Integer> desiredRooms) {
+		for(Integer rooms : desiredRooms.values()) {
+			if(rooms < 0) throw new InputException("Illegal input : number of rooms!");
+		}
+	}
+}

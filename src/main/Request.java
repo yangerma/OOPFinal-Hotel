@@ -12,7 +12,6 @@ public class Request {
 	
 	public Request(int userID, int requestID, int hotelID, String start, String end,
 			Map<Integer, Integer> rooms, int totalPrice) {
-		super();
 		this.userID = userID;
 		this.requestID = requestID;
 		this.hotelID = hotelID;

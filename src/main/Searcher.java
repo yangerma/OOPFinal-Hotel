@@ -43,8 +43,14 @@ public class Searcher {
 	public static ArrayList<Hotel> searchHotel
 	(int star, String start, String end, Map<Integer, Integer> desiredRooms) {
 		Connection connection = startConnection();
-		ArrayList<Hotel> list = new ArrayList<Hotel>();
 		
+		// Check if inputs are legal
+		InputChecker.starCheck(star);
+		InputChecker.datesCheck(start, end);
+		InputChecker.roomsCheck(desiredRooms);
+		
+		// Start looking into database
+		ArrayList<Hotel> list = new ArrayList<Hotel>();
 		try {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
@@ -57,6 +63,7 @@ public class Searcher {
 				pstmt.setInt(1, star);
 				rs = pstmt.executeQuery();
 			}
+			// Show the results
 			while (rs.next()) {
 				int id = rs.getInt("hotelID");
 				int price = checkHotel(id, start, end, desiredRooms);
@@ -81,6 +88,12 @@ public class Searcher {
 	public static Request makeRequest
 	(int userID, int hotelID, String start, String end, Map<Integer, Integer> desiredRooms) {
 		Connection connection = startConnection();
+		
+		// Check if inputs are legal
+		InputChecker.hotelCheck(hotelID);
+		InputChecker.datesCheck(start, end);
+		InputChecker.roomsCheck(desiredRooms);
+		
 		int price = 0;
 		int requestID = 0;
 		
@@ -88,6 +101,7 @@ public class Searcher {
 		try {
 			price = checkHotel(hotelID, start, end, desiredRooms);
 			if(price < 0) throw new NoMoreRoomException("Not enough " + dic.get(-1 * price) + " rooms available!");
+			
 			// Make the request if all desired rooms are available
 			try {
 				Statement statement = connection.createStatement();
@@ -135,19 +149,20 @@ public class Searcher {
 	// MAIN FUNCTION of project feature : 3.1 delete requests
 	public static boolean deleteRequest(int userID, int requestID) {
 		Connection connection = startConnection();
+		
+		// Check if inputs are legal
+		InputChecker.requestCheck(requestID);
+		
 		try {
 			// Check if the request exists
 			ResultSet rs = findRequest(userID, requestID);
 			if(!rs.next()) throw new RuntimeException("Wrong userID/requestID, no matching request found");
 			String start = rs.getString("startDate");
 			
-			// Retrieve today's date and see if it's too late
+			// See if it's too late to delete/modify request
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			ResultSet now = statement.executeQuery("SELECT Date('now')");
-			if(!now.next()) throw new RuntimeException("Something wierd happened.");
-			String today = now.getString(1);
-			if(today.compareTo(start) > 0) throw new TooLateException();
+			if(getToday().compareTo(start) > 0) throw new TooLateException("Too late to delete/modify request!");
 			
 			// No problem deleting the request now
 			String command = "DELETE FROM requests WHERE userID = ? AND requestID = ?";
@@ -168,6 +183,11 @@ public class Searcher {
 	// MAIN FUNCTION of project feature : 4. look for a certain request
 	public static Request searchRequest(int userID, int requestID) {
 		Connection connection = startConnection();
+		
+		// Check if inputs are legal
+		InputChecker.requestCheck(requestID);
+		
+		// Start looking into database
 		try {
 			ResultSet rs = findRequest(userID, requestID);
 			if(!rs.next()) throw new RuntimeException("Wrong userID/requestID, no matching request found");
@@ -184,6 +204,21 @@ public class Searcher {
 			System.err.println(e.getMessage());
 		} finally {
 			closeConnection();
+		}
+		return null;
+	}
+	
+	// Get today's date
+	// USED IN all function that needs to check if the time is too late
+	private static String getToday() {
+		try {
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			ResultSet now = statement.executeQuery("SELECT Date('now')");
+			if(!now.next()) throw new RuntimeException("Something wierd happened.");
+			return now.getString(1);
+		} catch(SQLException e) {
+			System.err.println(e.getMessage());
 		}
 		return null;
 	}
