@@ -85,7 +85,7 @@ public class GUI extends JFrame {
 		Login.setBounds(223, 182, 649, 151);
 		desktopPane.add(Login);
 		
-		JLabel label = new JLabel("\u5E33\u865F");
+		JLabel label = new JLabel("\u5E33\u865F(¼Æ¦r)");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label.setBounds(168, 13, 151, 36);
 		Login.add(label);
