@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.*;
 
 public class Searcher {
@@ -93,7 +94,7 @@ public class Searcher {
 		InputChecker.hotelCheck(hotelID);
 		InputChecker.datesCheck(start, end);
 		InputChecker.roomsCheck(desiredRooms);
-		if(getToday().compareTo(start) > 0) throw new TooLateException("Too late to book rooms!");
+		if(LocalDate.parse(getToday()).isAfter(LocalDate.parse(start))) throw new TooLateException("Too late to book rooms!");
 		
 		int price = 0;
 		int requestID = 0;
@@ -163,7 +164,8 @@ public class Searcher {
 			// Check if it's too late to delete request
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			if(getToday().compareTo(start) > 0) throw new TooLateException("Too late to delete/modify request!");
+			if(LocalDate.parse(getToday()).isAfter(LocalDate.parse(start)))
+				throw new TooLateException("Too late to delete/modify request!");
 			
 			// No problem deleting the request now
 			String command = "DELETE FROM requests WHERE userID = ? AND requestID = ?";
@@ -205,7 +207,8 @@ public class Searcher {
 			// Check if it's too late to modify request and check if the new request is valid
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			if(getToday().compareTo(start) > 0) throw new TooLateException("Too late to delete/modify request!");
+			if(LocalDate.parse(getToday()).isAfter(LocalDate.parse(start)))
+				throw new TooLateException("Too late to delete/modify request!");
 			InputChecker.newCheck(start, end, rooms, newStart, newEnd, newRooms);
 			
 			// Delete the request and make a new one

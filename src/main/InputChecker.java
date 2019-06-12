@@ -1,6 +1,8 @@
 package main;
 
 import java.util.*;
+import java.time.*;
+import java.time.format.*;
 
 public class InputChecker {
 	// Check hotelStar
@@ -18,37 +20,15 @@ public class InputChecker {
 	
 	// Check starting and ending dates
 	public static void datesCheck(String start, String end) {
-		String[] startParts = start.split("-");
-		String[] endParts = end.split("-");
-		if(startParts.length != 3) throw new InputException("Illegal input : start date!");
-		if(endParts.length != 3) throw new InputException("Illegal input : end date!");
-		String[] part = {"year", "month", "day"};
-		int[] days = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-		for(int i = 0; i < 3; i++) {
-			try {
-				int temp = Integer.valueOf(startParts[i]);
-				if(temp < 0) throw new InputException("Illegal input : start " + part[i] + "!");
-				if(i == 1 && temp > 12) throw new InputException("Illegal input : start month!");
-				if(i == 2 && temp > days[Integer.valueOf(startParts[1])])
-					throw new InputException("Illegal input : start day!");
-			} catch(NumberFormatException e) {
-				throw new RuntimeException("Not a number : start " + part[i] + "!");
-			} catch(NullPointerException e) {
-				throw new RuntimeException("Starting " + part[i] + " cannot be empty!");
-			}
-			try {
-				int temp = Integer.valueOf(endParts[i]);
-				if(temp < 0) throw new InputException("Illegal input : end " + part[i] + "!");
-				if(i == 1 && temp > 12) throw new InputException("Illegal input : end month!");
-				if(i == 2 && temp > days[Integer.valueOf(endParts[1])])
-					throw new InputException("Illegal input : end day!");
-			} catch(NumberFormatException e) {
-				throw new RuntimeException("Not a number : end " + part[i] + "!");
-			} catch(NullPointerException e) {
-				throw new RuntimeException("Ending " + part[i] + " cannot be empty!");
-			}
+		try {
+			LocalDate before = LocalDate.parse(start);
+			LocalDate after = LocalDate.parse(end);
+			if(before.isEqual(after)) 
+				throw new InputException("Illegal inputs : you cannot check in and check out at the smae day!");
+			if(before.isAfter(after)) throw new InputException("Illegal inputs : the dates are reversed!");
+		} catch(DateTimeParseException e) {
+			throw new InputException("Illegal input : date!");
 		}
-		if(start.compareTo(end) > 0) throw new RuntimeException("Illegal inputs : the dates are reversed!");
 	}
 	
 	// Check desired rooms
@@ -68,15 +48,15 @@ public class InputChecker {
 		// Check dates
 		int startDiff = start.compareTo(newStart);
 		int endDiff = end.compareTo(newEnd);
-		if(startDiff > 0 || endDiff < 0) throw new InputException("You can only shroten the time reserved!");
+		if(startDiff > 0 || endDiff < 0) throw new InputException("Illegal input : you can only shroten the time reserved!");
 		else if(startDiff != 0 && endDiff != 0) changed = true;
 		
 		// Check numbers of rooms
 		for(Map.Entry<Integer, String> roomType : Searcher.dic.entrySet()) {
 			int oldRoom = rooms.get(roomType.getKey());
 			int newRoom = newRooms.get(roomType.getKey());
-			if(oldRoom < newRoom)
-				throw new InputException("You are trying to book even more " + roomType.getValue() + " rooms!");
+			if(oldRoom < newRoom) 
+				throw new InputException("Illegal input : you are trying to book more " + roomType.getValue() + " rooms!");
 			else if(oldRoom != newRoom) changed = true;
 		}
 		

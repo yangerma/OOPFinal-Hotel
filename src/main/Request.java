@@ -1,5 +1,7 @@
 package main;
 import java.util.*;
+import java.time.*;
+import java.time.temporal.*;
 
 public class Request {
 	private int userID;
@@ -9,6 +11,13 @@ public class Request {
 	private String end;
 	private Map<Integer, Integer> rooms;
 	private int totalPrice;
+	
+	// A function to count the days between two dates
+	private static long countDays(String start, String end) {
+		LocalDate before = LocalDate.parse(start);
+		LocalDate after = LocalDate.parse(end);
+		return ChronoUnit.DAYS.between(before, after);
+	}
 	
 	public Request(int userID, int requestID, int hotelID, String start, String end,
 			Map<Integer, Integer> rooms, int totalPrice) {
@@ -27,7 +36,7 @@ public class Request {
 		for(Map.Entry<Integer, Integer> entry : rooms.entrySet()) {
 			ret += Searcher.dic.get(entry.getKey()) + " : " + entry.getValue() + "\n";
 		}
-		ret += "totalPrice = " + totalPrice;
+		ret += "totalPrice = " + totalPrice * Math.toIntExact(countDays(start, end));
 		return ret;
 	}
 }
