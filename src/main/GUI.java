@@ -12,7 +12,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.tools.Tool;
-
+import java.awt.Dimension;
 import javax.swing.JDesktopPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLayeredPane;
@@ -21,7 +21,7 @@ import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-
+import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionListener;
@@ -55,6 +55,7 @@ public class GUI extends JFrame {
 				try {
 					GUI frame = new GUI();
 					frame.setVisible(true);
+					//frame.pack();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -85,7 +86,7 @@ public class GUI extends JFrame {
 		Login.setBounds(223, 182, 649, 151);
 		desktopPane.add(Login);
 		
-		JLabel label = new JLabel("\u5E33\u865F(¼Æ¦r)");
+		JLabel label = new JLabel("\u5E33\u865F(Number Only)");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label.setBounds(168, 13, 151, 36);
 		Login.add(label);
@@ -113,7 +114,7 @@ public class GUI extends JFrame {
 				if(flag == false) {
 					flag = true;
 					JInternalFrame inf = new JInternalFrame();
-					inf = new JInternalFrame("©Ð¶¡¬d¸ß ",true,true,true,true);
+					inf = new JInternalFrame("Hotel Query ",true,true,true,true);
 					
 					inf.setBounds(100, 100, 1054, 485);
 				    inf.setVisible(true);
@@ -128,7 +129,7 @@ public class GUI extends JFrame {
 					scrollPane.setViewportView(textArea);
 					
 					JLabel label = new JLabel("\u5165\u4F4F\u65E5\u671F");
-					label.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label.setBounds(480, 26, 118, 64);
 					icp.add(label);
 					
@@ -215,12 +216,12 @@ public class GUI extends JFrame {
 					icp.add(OutYear);
 					
 					JLabel label_5 = new JLabel("\u9000\u623F\u65E5\u671F");
-					label_5.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label_5.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label_5.setBounds(480, 89, 108, 45);
 					icp.add(label_5);
 					
 					JLabel label_6 = new JLabel("\u5165\u4F4F\u4EBA\u6578");
-					label_6.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label_6.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label_6.setBounds(480, 141, 108, 45);
 					icp.add(label_6);
 					
@@ -229,7 +230,7 @@ public class GUI extends JFrame {
 					icp.add(People);
 					
 					JLabel label_7 = new JLabel("\u661F\u7D1A");
-					label_7.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label_7.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label_7.setBounds(480, 199, 57, 45);
 					icp.add(label_7);
 					
@@ -266,7 +267,7 @@ public class GUI extends JFrame {
 					icp.add(Single);
 					
 					JLabel label_8 = new JLabel("\u5BA2\u623F\u6578\u91CF");
-					label_8.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label_8.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label_8.setBounds(480, 252, 108, 45);
 					icp.add(label_8);
 					
@@ -368,7 +369,7 @@ public class GUI extends JFrame {
 					flag = true;
 					
 					JInternalFrame inf = new JInternalFrame();
-					inf = new JInternalFrame("¹w­q©Ð¶¡ ",true,true,true,true);
+					inf = new JInternalFrame("Reserve Room ",true,true,true,true);
 					
 					inf.setBounds(100, 100, 1055, 479);
 				    inf.setVisible(true);
@@ -383,7 +384,7 @@ public class GUI extends JFrame {
 					
 					JLabel label = new JLabel("\u65C5\u9928\u7DE8\u865F");
 					label.setHorizontalAlignment(SwingConstants.CENTER);
-					label.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label.setBounds(409, 123, 149, 43);
 					icp.add(label);
 					
@@ -392,7 +393,7 @@ public class GUI extends JFrame {
 					icp.add(HotelID);
 					
 					JLabel label_1 = new JLabel("\u5165\u4F4F\u65E5\u671F");
-					label_1.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label_1.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label_1.setBounds(432, 179, 118, 64);
 					icp.add(label_1);
 					
@@ -420,7 +421,7 @@ public class GUI extends JFrame {
 					icp.add(EnterDay);
 					
 					JLabel label_4 = new JLabel("\u9000\u623F\u65E5\u671F");
-					label_4.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label_4.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label_4.setBounds(432, 242, 108, 45);
 					icp.add(label_4);
 					
@@ -462,7 +463,7 @@ public class GUI extends JFrame {
 					
 					JLabel label_7 = new JLabel("\u5165\u4F4F\u623F\u9593");
 					label_7.setHorizontalAlignment(SwingConstants.CENTER);
-					label_7.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label_7.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label_7.setBounds(735, 123, 149, 43);
 					icp.add(label_7);
 					
@@ -576,7 +577,7 @@ public class GUI extends JFrame {
 				if(flag == false) {
 					flag = true;
 					JInternalFrame inf = new JInternalFrame();
-					inf=new JInternalFrame("­×§ï/¨ú®ø­q³æ",true,true,true,true);
+					inf=new JInternalFrame("Modify/Cancel Reservation",true,true,true,true);
 				    inf.setBounds(100, 100, 1049, 577);
 				    inf.setVisible(true);
 				    desktopPane.add(inf);
@@ -591,7 +592,7 @@ public class GUI extends JFrame {
 					scrollPane.setViewportView(textArea);
 					
 					JLabel label = new JLabel("\u8A02\u4F4D\u4EE3\u865F");
-					label.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label.setHorizontalAlignment(SwingConstants.CENTER);
 					label.setBounds(442, 33, 210, 41);
 					icp.add(label);
@@ -773,15 +774,14 @@ public class GUI extends JFrame {
 					SendModify.setVisible(false);
 					
 					Send.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0) {
-							Before.setVisible(true);
-							After.setVisible(true);
-							btnCancel.setVisible(true);
-							SendModify.setVisible(true);
-							
+						public void actionPerformed(ActionEvent arg0) {							
 							try {
 								Request ret = searchRoom.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
 								if(ret != null) {
+									Before.setVisible(true);
+									After.setVisible(true);
+									btnCancel.setVisible(true);
+									SendModify.setVisible(true);
 									textArea.setText("");
 									String[] tmp = ret.toString().split("\n");
 									String[] tmp2 = tmp[0].split(",|=");
@@ -791,12 +791,69 @@ public class GUI extends JFrame {
 									SingleOriginal.setText(tmp[1].split(":")[1]);
 									DoubleOriginal.setText(tmp[2].split(":")[1]);
 									QuadOriginal.setText(tmp[3].split(":")[1]);
+									EnterYear.setText(tmp2[7].split("-")[0]);
+									EnterMonth.setText(tmp2[7].split("-")[1]);
+									EnterDay.setText(tmp2[7].split("-")[2]);
+									OutYear.setText(tmp2[9].split("-")[0]);
+									OutMonth.setText(tmp2[9].split("-")[1]);
+									OutDay.setText(tmp2[9].split("-")[2]);
+									StringBuilder num = new StringBuilder(tmp[1].split(":")[1]);
+									num.deleteCharAt(0);
+									
+									if (!num.toString().equals("0")) {
+										Single.setSelected(true);
+										SingleRoom.setValue(Integer.valueOf(num.toString()));
+									}
+									num = new StringBuilder(tmp[2].split(":")[1]);
+									num.deleteCharAt(0);
+									if (!num.toString().equals("0")) {
+										Double.setSelected(true);
+										DoubleRoom.setValue(Integer.valueOf(num.toString()));
+									}
+									num = new StringBuilder(tmp[3].split(":")[1]);
+									num.deleteCharAt(0);
+									if (!num.toString().equals("0")) {
+										Quad.setSelected(true);
+										QuadRoom.setValue(Integer.valueOf(num.toString()));
+									}
 								}
 								else {
+									Before.setVisible(false);
+									After.setVisible(false);
+									btnCancel.setVisible(false);
+									SendModify.setVisible(false);
 									textArea.append("Query error. No such Reserved ID.");
 								}
 							}catch(Exception err) {
+								Before.setVisible(false);
+								After.setVisible(false);
+								btnCancel.setVisible(false);
+								SendModify.setVisible(false);
 								textArea.setText(err.toString());
+								HotelID.setText("");
+								EnterDateOriginal.setText("");
+								OutDateOriginal.setText("");
+								SingleOriginal.setText("");
+								DoubleOriginal.setText("");
+								QuadOriginal.setText("");
+								EnterYear.setText("");
+								EnterMonth.setText("");
+								EnterDay.setText("");
+								OutYear.setText("");
+								OutMonth.setText("");
+								OutDay.setText("");
+								
+								Single.setSelected(false);
+								SingleRoom.setValue(0);
+							
+							
+								Double.setSelected(false);
+								DoubleRoom.setValue(Integer.valueOf(0));
+								
+								
+								Quad.setSelected(false);
+								QuadRoom.setValue(Integer.valueOf(0));
+							
 								textArea.append("\r\nQuery error. No such Reserved ID.");
 							}
 						}
@@ -809,9 +866,65 @@ public class GUI extends JFrame {
 									textArea.setText("Cancel successfully");
 								}
 								else {
+									Before.setVisible(false);
+									After.setVisible(false);
+									btnCancel.setVisible(false);
+									SendModify.setVisible(false);
+									
+									HotelID.setText("");
+									EnterDateOriginal.setText("");
+									OutDateOriginal.setText("");
+									SingleOriginal.setText("");
+									DoubleOriginal.setText("");
+									QuadOriginal.setText("");
+									EnterYear.setText("");
+									EnterMonth.setText("");
+									EnterDay.setText("");
+									OutYear.setText("");
+									OutMonth.setText("");
+									OutDay.setText("");
+									
+									Single.setSelected(false);
+									SingleRoom.setValue(0);
+								
+								
+									Double.setSelected(false);
+									DoubleRoom.setValue(Integer.valueOf(0));
+									
+									
+									Quad.setSelected(false);
+									QuadRoom.setValue(Integer.valueOf(0));
 									textArea.setText("Fail to delete. Please check your reserved ID.");
 								}
 							}catch(Exception err) {
+								Before.setVisible(false);
+								After.setVisible(false);
+								btnCancel.setVisible(false);
+								SendModify.setVisible(false);
+								textArea.setText(err.toString());
+								HotelID.setText("");
+								EnterDateOriginal.setText("");
+								OutDateOriginal.setText("");
+								SingleOriginal.setText("");
+								DoubleOriginal.setText("");
+								QuadOriginal.setText("");
+								EnterYear.setText("");
+								EnterMonth.setText("");
+								EnterDay.setText("");
+								OutYear.setText("");
+								OutMonth.setText("");
+								OutDay.setText("");
+								
+								Single.setSelected(false);
+								SingleRoom.setValue(0);
+							
+							
+								Double.setSelected(false);
+								DoubleRoom.setValue(Integer.valueOf(0));
+								
+								
+								Quad.setSelected(false);
+								QuadRoom.setValue(Integer.valueOf(0));
 								textArea.setText("");
 								textArea.append(err.toString());
 								textArea.append("\r\nFail to delete. Please check your reserved ID.");
@@ -847,7 +960,7 @@ public class GUI extends JFrame {
 				if(flag == false) {
 					flag = true;
 					JInternalFrame inf = new JInternalFrame();
-					inf=new JInternalFrame("¬d¸ß­q³æ",true,true,true,true);
+					inf=new JInternalFrame("Reservation Query",true,true,true,true);
 				    inf.setBounds(100, 100, 563, 613);
 				    inf.setVisible(true);
 				    desktopPane.add(inf);
@@ -863,7 +976,7 @@ public class GUI extends JFrame {
 					scrollPane.setVisible(false);
 					
 					JLabel label = new JLabel("\u8A02\u4F4D\u4EE3\u865F");
-					label.setFont(new Font("·s²Ó©úÅé", Font.PLAIN, 22));
+					label.setFont(new Font("æ–°ç´°æ˜Žé«”", Font.PLAIN, 22));
 					label.setHorizontalAlignment(SwingConstants.CENTER);
 					label.setBounds(30, 32, 194, 85);
 					icp.add(label);
@@ -903,10 +1016,16 @@ public class GUI extends JFrame {
 		JButton LoginSend = new JButton("OK");
 		LoginSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				account = Account.getText();
-				password = Password.getText();
-				Login.setVisible(false);
-				ToolBar.setVisible(true);
+				if(Account.getText().matches("[0-9]+")) {
+					account = Account.getText();
+					password = Password.getText();
+					Login.setVisible(false);
+					ToolBar.setVisible(true);
+				}
+				else {
+					Account.setText("Number Only");
+					Password.setText("");
+				}
 			}
 		});
 		LoginSend.setBounds(168, 111, 151, 36);
