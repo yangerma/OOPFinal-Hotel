@@ -824,7 +824,8 @@ public class GUI extends JFrame {
 									SendModify.setVisible(false);
 									textArea.append("Query error. No such Reserved ID.");
 								}
-							}catch(Exception err) {Before.setVisible(false);
+							}catch(Exception err) {
+								Before.setVisible(false);
 								After.setVisible(false);
 								btnCancel.setVisible(false);
 								SendModify.setVisible(false);
@@ -865,9 +866,65 @@ public class GUI extends JFrame {
 									textArea.setText("Cancel successfully");
 								}
 								else {
+									Before.setVisible(false);
+									After.setVisible(false);
+									btnCancel.setVisible(false);
+									SendModify.setVisible(false);
+									
+									HotelID.setText("");
+									EnterDateOriginal.setText("");
+									OutDateOriginal.setText("");
+									SingleOriginal.setText("");
+									DoubleOriginal.setText("");
+									QuadOriginal.setText("");
+									EnterYear.setText("");
+									EnterMonth.setText("");
+									EnterDay.setText("");
+									OutYear.setText("");
+									OutMonth.setText("");
+									OutDay.setText("");
+									
+									Single.setSelected(false);
+									SingleRoom.setValue(0);
+								
+								
+									Double.setSelected(false);
+									DoubleRoom.setValue(Integer.valueOf(0));
+									
+									
+									Quad.setSelected(false);
+									QuadRoom.setValue(Integer.valueOf(0));
 									textArea.setText("Fail to delete. Please check your reserved ID.");
 								}
 							}catch(Exception err) {
+								Before.setVisible(false);
+								After.setVisible(false);
+								btnCancel.setVisible(false);
+								SendModify.setVisible(false);
+								textArea.setText(err.toString());
+								HotelID.setText("");
+								EnterDateOriginal.setText("");
+								OutDateOriginal.setText("");
+								SingleOriginal.setText("");
+								DoubleOriginal.setText("");
+								QuadOriginal.setText("");
+								EnterYear.setText("");
+								EnterMonth.setText("");
+								EnterDay.setText("");
+								OutYear.setText("");
+								OutMonth.setText("");
+								OutDay.setText("");
+								
+								Single.setSelected(false);
+								SingleRoom.setValue(0);
+							
+							
+								Double.setSelected(false);
+								DoubleRoom.setValue(Integer.valueOf(0));
+								
+								
+								Quad.setSelected(false);
+								QuadRoom.setValue(Integer.valueOf(0));
 								textArea.setText("");
 								textArea.append(err.toString());
 								textArea.append("\r\nFail to delete. Please check your reserved ID.");
