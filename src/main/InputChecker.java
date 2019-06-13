@@ -52,7 +52,7 @@ public class InputChecker {
 		LocalDate newAfter = LocalDate.parse(newEnd);
 		if(newBefore.isBefore(before) || newAfter.isAfter(after))
 			throw new InputException("Illegal input : you can only shroten the time reserved!");
-		else if(!newBefore.isEqual(before) && !newAfter.isAfter(after)) changed = true;
+		else if(!newBefore.isEqual(before) && !newAfter.isEqual(after)) changed = true;
 		
 		// Check numbers of rooms
 		for(Map.Entry<Integer, String> roomType : Searcher.dic.entrySet()) {
