@@ -934,17 +934,83 @@ public class GUI extends JFrame {
 					
 					SendModify.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							textArea.append("Check-in Day: " + EnterYear.getText() + "/" + EnterMonth.getText() + "/" + EnterDay.getText() + "\r\n");
-							textArea.append("Check-out Day: " + OutYear.getText() + "/" + OutMonth.getText() + "/" + OutDay.getText() + "\r\n");
-							textArea.append("Hotel ID: " + HotelID.getText()+"\r\n");
-							if(Single.isSelected()) {
-								textArea.append("Single room: " + SingleRoom.getValue()+"\r\n");
-							}
-							if(Double.isSelected()) {
-								textArea.append("Double room: " + DoubleRoom.getValue()+"\r\n");
-							}
-							if(Quad.isSelected()) {
-								textArea.append("Quad room: " + QuadRoom.getValue()+"\r\n");
+							try {
+								Map<Integer, Integer> desiredRooms = new HashMap<Integer, Integer>();
+								if (Single.isSelected()) {
+									desiredRooms.put(1, Integer.valueOf(SingleRoom.getValue().toString()));
+								}
+								else {
+									desiredRooms.put(1,0);
+								}
+								if (Double.isSelected()) {
+									desiredRooms.put(2, Integer.valueOf(DoubleRoom.getValue().toString()));
+								}
+								else {
+									desiredRooms.put(2,0);
+								}
+								if (Quad.isSelected()) {
+									desiredRooms.put(4, Integer.valueOf(QuadRoom.getValue().toString()));
+								}
+								else {
+									desiredRooms.put(4,0);
+								}
+								String EnterDate = EnterYear.getText();
+								if (Integer.valueOf(EnterMonth.getText()) < 10) {
+									EnterDate += "-0";
+									EnterDate += Integer.valueOf(EnterMonth.getText()).toString();
+								}
+								else {
+									EnterDate += "-";
+									EnterDate += Integer.valueOf(EnterMonth.getText()).toString();
+								}
+								if (Integer.valueOf(EnterDay.getText()) < 10) {
+									EnterDate += "-0";
+									EnterDate += Integer.valueOf(EnterDay.getText()).toString();
+								}
+								else {
+									EnterDate += "-";
+									EnterDate += Integer.valueOf(EnterDay.getText()).toString();
+								}
+								String OutDate = OutYear.getText();
+								if (Integer.valueOf(OutMonth.getText()) < 10) {
+									OutDate += "-0";
+									OutDate += Integer.valueOf(OutMonth.getText()).toString();
+								}
+								else {
+									OutDate += "-";
+									OutDate += Integer.valueOf(OutMonth.getText()).toString();
+								}
+								if (Integer.valueOf(OutDay.getText()) < 10) {
+									OutDate += "-0";
+									OutDate += Integer.valueOf(OutDay.getText()).toString();
+								}
+								else {
+									OutDate += "-";
+									OutDate += Integer.valueOf(OutDay.getText()).toString();
+								}
+								textArea.setText("");
+								
+								if(EnterDate.charAt(0) == ' ') {
+									StringBuilder tmp = new StringBuilder(EnterDate);
+									tmp.deleteCharAt(0);
+									EnterDate = tmp.toString();
+								}
+								if(OutDate.charAt(0) == ' ') {
+									StringBuilder tmp = new StringBuilder(OutDate);
+									tmp.deleteCharAt(0);
+									OutDate = tmp.toString();
+								}
+								System.out.println(EnterDate+";"+OutDate);
+								if(searchRoom.modifyRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText().toString()), EnterDate, OutDate, desiredRooms)) {
+									textArea.setText("Modify reservation successfully.");
+								}
+								else {
+									textArea.setText("Error. Please check your request.");
+								}
+							}catch(Exception err) {
+								textArea.setText(err.toString());
+								textArea.append("\r\nPlease check your input. Your input should be in the constraints.");
+								
 							}
 						}
 					});
