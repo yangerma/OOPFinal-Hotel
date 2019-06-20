@@ -55,7 +55,6 @@ public class GUI extends JFrame {
 				try {
 					GUI frame = new GUI();
 					frame.setVisible(true);
-					//frame.pack();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -69,6 +68,7 @@ public class GUI extends JFrame {
 	public GUI() {
 		/**
 		 * Set main GUI
+		 * Include login interface and tool bar
 		 */
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1101, 578);
@@ -110,8 +110,12 @@ public class GUI extends JFrame {
 		 */
 		JButton Search = new JButton("\u67E5\u8A62\u65C5\u9928");
 		Search.addActionListener(new ActionListener() {
+			/**
+			 * Action listener for room searching button
+			 * If pressed, internal JFrame is created and displays the console for room searching
+			 */
 			public void actionPerformed(ActionEvent e) {
-				if(flag == false) {
+				if(flag == false) { //Make sure there is only one internal frame visible
 					flag = true;
 					JInternalFrame inf = new JInternalFrame();
 					inf = new JInternalFrame("Hotel Query ",true,true,true,true);
@@ -277,6 +281,10 @@ public class GUI extends JFrame {
 					icp.add(Send);
 					
 					Send.addActionListener(new ActionListener() {
+						/**
+						 * Add action listener for sending button
+						 * Output corresponding information or exception message on the text area  
+						 */
 						public void actionPerformed(ActionEvent e) {
 							if (Agree.isSelected()) {
 								try {
@@ -361,10 +369,16 @@ public class GUI extends JFrame {
 			}
 		});
 		ToolBar.add(Search);
-		
+		/**
+		 * Main part for reservation
+		 */
 		JButton Reserve = new JButton("\u9810\u5B9A\u65C5\u9928");
 		Reserve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				/**
+				 * Add action listener to reserve button
+				 * If button is pressed, display corresponding console pane
+				 */
 				if (flag == false) {
 					flag = true;
 					
@@ -491,6 +505,10 @@ public class GUI extends JFrame {
 					QuadRoom.setBounds(891, 334, 120, 42);
 					icp.add(QuadRoom);
 					Send.addActionListener(new ActionListener() {
+						/**
+						 * Add action listener to send button
+						 * Display information and exception message on the text area
+						 */
 						public void actionPerformed(ActionEvent e) {
 							if (Agree.isSelected()) {	
 								try {
@@ -570,10 +588,16 @@ public class GUI extends JFrame {
 			}
 		});
 		ToolBar.add(Reserve);
-		
+		/**
+		 * Create button for modify reservation
+		 */
 		JButton Modify = new JButton("\u4FEE\u6539\u8A02\u55AE");
 		Modify.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				/**
+				 * Add action listener for modify button
+				 * If pressed, corresponding information of console is shown
+				 */
 				if(flag == false) {
 					flag = true;
 					JInternalFrame inf = new JInternalFrame();
@@ -774,7 +798,11 @@ public class GUI extends JFrame {
 					SendModify.setVisible(false);
 					
 					Send.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0) {							
+						public void actionPerformed(ActionEvent arg0) {		
+							/**
+							 * Add action listener to send button
+							 * Display information and exception message on text area
+							 */
 							try {
 								Request ret = searchRoom.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
 								if(ret != null) {
@@ -860,6 +888,10 @@ public class GUI extends JFrame {
 					});
 					
 					btnCancel.addActionListener(new ActionListener() {
+						/**
+						 * Add listener to cancel button
+						 * Cancel corresponding reservation or show exception message
+						 */
 						public void actionPerformed(ActionEvent e) {
 							try {
 								if(searchRoom.deleteRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()))) {
@@ -931,7 +963,10 @@ public class GUI extends JFrame {
 							}
 						}
 					});
-					
+					/**
+					 * Send modified reservation
+					 * Show information when succeed, or display exception message when fail
+					 */
 					SendModify.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 							try {
@@ -1019,10 +1054,16 @@ public class GUI extends JFrame {
 			}
 		});
 		ToolBar.add(Modify);
-		
+		/**
+		 * Set button for reservation query
+		 */
 		JButton Query = new JButton("\u67E5\u8A62\u8A02\u55AE");
 		Query.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				/**
+				 * Add action listener to query button
+				 * When pressed, information and console are shown
+				 */
 				if(flag == false) {
 					flag = true;
 					JInternalFrame inf = new JInternalFrame();
@@ -1054,6 +1095,10 @@ public class GUI extends JFrame {
 					JButton Send = new JButton("\u78BA\u8A8D");
 					Send.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
+							/**
+							 * Add listener to send button
+							 * Show information when the sending is success, or show exception message
+							 */
 							scrollPane.setVisible(true);
 							try {
 								Request ret = searchRoom.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
@@ -1078,7 +1123,9 @@ public class GUI extends JFrame {
 			}
 		});
 		ToolBar.add(Query);
-		
+		/**
+		 * Console pane for login interface
+		 */
 		JButton LoginSend = new JButton("OK");
 		LoginSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1112,7 +1159,9 @@ public class GUI extends JFrame {
 		
 		
 	}
-
+	/**
+	 * Handler for window closing
+	 */
 	class WindowHandler extends InternalFrameAdapter {
 		public void internalFrameClosing(WindowEvent e) {
 		    flag = false;  
