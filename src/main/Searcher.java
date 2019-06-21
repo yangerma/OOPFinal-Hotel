@@ -366,42 +366,4 @@ public class Searcher {
 		}
 		return null;
 	}
-	
-	// Demo code snippet
-	public static void main(String[] args) {
-		// Initialize the rooms desired into a map<Integer, Integer>
-		Map<Integer, Integer> desiredRooms = new HashMap<Integer, Integer>();
-		desiredRooms.put(1, 0);
-		desiredRooms.put(2, 20);
-		desiredRooms.put(4, 25);
-		
-		// Demo for project feature : 1. look for available hotels
-		System.out.println("Feature 1 demo");
-		for (Hotel temp : searchHotel(5, "2011-01-01", "2011-01-02", desiredRooms)) {
-			System.out.println(temp);
-		}
-		
-		// Demo for project feature : 2. make reservations
-		System.out.println("\nFeature 2 demo");
-		System.out.println(makeRequest(0, 770, "2020-01-01", "2020-01-03", desiredRooms));
-		System.out.println(makeRequest(0, 1117, "2020-02-04", "2020-02-06", desiredRooms));
-		System.out.println(makeRequest(1, 1176, "2019-10-03", "2019-10-10", desiredRooms));
-		
-		// Demo for project feature : 3.1 delete requests
-		System.out.println("\nFeature 3 demo");
-		if(deleteRequest(0, 1)) System.out.println("Successfully deleted request (0, 1)");
-		if(deleteRequest(0, 2)) System.out.println("Successfully deleted request (0, 2)");
-		
-		// Demo for project feature : 3.2 modify requests
-		if(modifyRequest(1, 3, "2019-10-05", "2019-10-10", desiredRooms))
-			System.out.println("Successfully modified request (1, 3)");
-		
-		// Demo for project feature : 4. look for a certain request
-		System.out.println("\nFeature 4 demo");
-		Request ret = searchRequest(1, 3);
-		if(ret != null) System.out.println("Search result :\n" + ret.toString());
-		
-		// Cleaning up
-		deleteRequest(1, 3);
-	}
 }
