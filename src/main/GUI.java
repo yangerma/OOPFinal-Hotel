@@ -45,7 +45,6 @@ public class GUI extends JFrame {
 	private String password;
 	private JPasswordField Password;
 	private boolean flag = false;
-	private Searcher searchRoom = new Searcher();
 	/**
 	 * Launch the application.
 	 */
@@ -344,7 +343,7 @@ public class GUI extends JFrame {
 									textArea.setText("");
 									try {
 										boolean flag = false;
-										for (Hotel temp : searchRoom.searchHotel(Integer.valueOf(Star.getValue().toString()), EnterDate, OutDate, desiredRooms)) {
+										for (Hotel temp : Searcher.searchHotel(Integer.valueOf(Star.getValue().toString()), EnterDate, OutDate, desiredRooms)) {
 											textArea.append(temp.toString());
 											textArea.append("\r\n");
 											flag = true;
@@ -568,7 +567,7 @@ public class GUI extends JFrame {
 									textArea.setText("");
 									
 									try {
-										textArea.append(searchRoom.makeRequest(Integer.valueOf(account), Integer.valueOf(HotelID.getText().toString()), EnterDate, OutDate, desiredRooms).toString());
+										textArea.append(Searcher.makeRequest(Integer.valueOf(account), Integer.valueOf(HotelID.getText().toString()), EnterDate, OutDate, desiredRooms).toString());
 									}catch(Exception err) {
 										textArea.append(err.toString());
 									}
@@ -804,7 +803,7 @@ public class GUI extends JFrame {
 							 * Display information and exception message on text area
 							 */
 							try {
-								Request ret = searchRoom.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
+								Request ret = Searcher.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
 								if(ret != null) {
 									Before.setVisible(true);
 									After.setVisible(true);
@@ -894,7 +893,7 @@ public class GUI extends JFrame {
 						 */
 						public void actionPerformed(ActionEvent e) {
 							try {
-								if(searchRoom.deleteRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()))) {
+								if(Searcher.deleteRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()))) {
 									textArea.setText("Cancel successfully");
 								}
 								else {
@@ -1036,7 +1035,7 @@ public class GUI extends JFrame {
 									OutDate = tmp.toString();
 								}
 								System.out.println(EnterDate+";"+OutDate);
-								if(searchRoom.modifyRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText().toString()), EnterDate, OutDate, desiredRooms)) {
+								if(Searcher.modifyRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText().toString()), EnterDate, OutDate, desiredRooms)) {
 									textArea.setText("Modify reservation successfully.");
 								}
 								else {
@@ -1101,7 +1100,7 @@ public class GUI extends JFrame {
 							 */
 							scrollPane.setVisible(true);
 							try {
-								Request ret = searchRoom.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
+								Request ret = Searcher.searchRequest(Integer.valueOf(account), Integer.valueOf(ReservedID.getText()));
 								if(ret != null) {
 									textArea.setText("");
 									textArea.append(ret.toString());
