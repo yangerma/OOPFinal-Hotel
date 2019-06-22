@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.awt.event.ActionEvent;
@@ -236,10 +237,30 @@ public class GUI extends JFrame {
 					label_7.setFont(new Font("新細明體", Font.PLAIN, 22));
 					label_7.setBounds(480, 199, 57, 45);
 					icp.add(label_7);
-					
+					/*
 					JSpinner Star = new JSpinner();
 					Star.setBounds(596, 196, 190, 42);
 					icp.add(Star);
+					*/
+					JCheckBox StarOne = new JCheckBox("一星級");
+					StarOne.setBounds(596, 211, 73, 27);
+					icp.add(StarOne);
+					
+					JCheckBox StarTwo = new JCheckBox("二星級");
+					StarTwo.setBounds(669, 211, 73, 27);
+					icp.add(StarTwo);
+					
+					JCheckBox StarThree = new JCheckBox("三星級");
+					StarThree.setBounds(739, 211, 73, 27);
+					icp.add(StarThree);
+					
+					JCheckBox StarFour = new JCheckBox("四星級");
+					StarFour.setBounds(818, 211, 73, 27);
+					icp.add(StarFour);
+					
+					JCheckBox StarFive = new JCheckBox("五星級");
+					StarFive.setBounds(897, 211, 73, 27);
+					icp.add(StarFive);
 					
 					JCheckBox Agree = new JCheckBox("\u540C\u610F\u4F7F\u7528\u8005\u689D\u6B3E");
 					Agree.setBounds(480, 369, 190, 45);
@@ -341,18 +362,29 @@ public class GUI extends JFrame {
 										OutDate += Integer.valueOf(OutDay.getText()).toString();
 									}
 									textArea.setText("");
-									try {
-										boolean flag = false;
-										for (Hotel temp : Searcher.searchHotel(Integer.valueOf(Star.getValue().toString()), EnterDate, OutDate, desiredRooms)) {
-											textArea.append(temp.toString());
-											textArea.append("\r\n");
-											flag = true;
-										}
-										if (flag == false) {
-											textArea.setText("No suitable hotel.");
-										}
-									}catch(Exception err) {
-										textArea.append(err.toString());
+									int tmp1=0, tmp2=0;
+									if (StarOne.isSelected()) {
+										tmp1 += 1;
+										tmp2 += Search(1, EnterDate, OutDate, desiredRooms, textArea);
+									}
+									if (StarTwo.isSelected()) {
+										tmp1 += 1;
+										tmp2 += Search(2, EnterDate, OutDate, desiredRooms, textArea);
+									}
+									if (StarThree.isSelected()) {
+										tmp1 += 1;
+										tmp2 += Search(3, EnterDate, OutDate, desiredRooms, textArea);
+									}
+									if (StarFour.isSelected()) {
+										tmp1 += 1;
+										tmp2 += Search(4, EnterDate, OutDate, desiredRooms, textArea);
+									}
+									if (StarFive.isSelected()) {
+										tmp1 += 1;
+										tmp2 += Search(5, EnterDate, OutDate, desiredRooms, textArea);
+									}
+									if (tmp1 == tmp2) {
+										textArea.append("No suitable Hotels. \r\n");
 									}
 								}catch(Exception err) {
 									textArea.setText("Input Error.");
@@ -1168,5 +1200,27 @@ public class GUI extends JFrame {
 		public void internalFrameClosed(InternalFrameEvent e) {
 			flag = false;
 	    }
+	}
+	
+	int Search(int star, String EnterDate, String OutDate, Map<Integer, Integer>desiredRooms, JTextArea textArea){
+		try {
+			boolean flag = false;
+			for (Hotel temp : Searcher.searchHotel(star, EnterDate, OutDate, desiredRooms)) {
+				textArea.append(temp.toString());
+				textArea.append("\r\n");
+				flag = true;
+			}
+			if (flag == false) {
+				return 1;
+			}			
+			else {
+				return 0;
+			}
+		}catch(NoMoreRoomException err) {
+			return 1;
+		}catch(Exception err) {
+			textArea.setText(err.toString());
+			return 0;
+		}
 	}
 }
